@@ -172,12 +172,15 @@ export class FavoritesService {
 
   async delete(type: string, id: string) {
     const favorite = await this.getFavorite();
-    const entity = [...favorite[type]];
-    const newEntity = entity.filter((entityId) => entityId !== id);
 
-    if (entity.length !== newEntity.length) {
-      favorite[type] = newEntity;
-      return this.favoriteRepository.save(favorite);
+    if (favorite) {
+      const entity = [...favorite[type]];
+      const newEntity = entity.filter((entityId) => entityId !== id);
+
+      if (entity.length !== newEntity.length) {
+        favorite[type] = newEntity;
+        return this.favoriteRepository.save(favorite);
+      }
     }
   }
 

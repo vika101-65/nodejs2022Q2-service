@@ -296,7 +296,7 @@ describe('artist (e2e)', () => {
 
       expect(searchTrackResponse.statusCode).toBe(StatusCodes.OK);
 
-      const { artistId: trackArtistId } = searchTrackResponse.body;
+      const { artist: trackArtistId } = searchTrackResponse.body;
 
       expect(trackArtistId).toBeNull();
     });
