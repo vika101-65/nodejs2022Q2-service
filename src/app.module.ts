@@ -1,4 +1,4 @@
-import { Inject, Module } from '@nestjs/common';
+import { Inject, MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'rxjs';
@@ -12,6 +12,7 @@ import { FavoritesService } from './favorites/favorites.service';
 import { FavoritesModule } from './favorites/favorites.module';
 import databaseConfig from './databaseConfig';
 import { DataSource } from 'typeorm';
+import LoggerMiddleware from './logger/logger.middleware';
 
 const typeOrmConfig = {
   imports: [
@@ -55,4 +56,8 @@ const typeOrmConfig = {
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
