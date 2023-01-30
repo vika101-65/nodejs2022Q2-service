@@ -14,8 +14,9 @@ import {
 } from '@nestjs/common';
 import { identity } from 'rxjs';
 import { CreateUserDto } from './dto/createUser.dto';
+import { ReturnUserDto } from './dto/returnUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -23,17 +24,17 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  getAllUsers(): Promise<UserEntity[]> {
+  getAllUsers(): Promise<ReturnUserDto[]> {
     return this.usersService.findAllUsers();
   }
 
   @Get(':id')
-  getOneUser(@Param('id', ParseUUIDPipe) id: string): Promise<UserEntity> {
+  getOneUser(@Param('id', ParseUUIDPipe) id: string): Promise<ReturnUserDto> {
     return this.usersService.findOneUser(id);
   }
 
   @Post()
-  createUser(@Body() createDataUser: CreateUserDto): Promise<UserEntity> {
+  createUser(@Body() createDataUser: CreateUserDto): Promise<ReturnUserDto> {
     return this.usersService.createUser(createDataUser);
   }
 
@@ -41,7 +42,7 @@ export class UsersController {
   updateUser(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUser: UpdateUserDto,
-  ): Promise<UserEntity> {
+  ): Promise<ReturnUserDto> {
     return this.usersService.updateUser(id, updateUser);
   }
 

@@ -2,8 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
+import { ReturnUserDto } from './dto/returnUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,15 +13,41 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
   ) {}
 
-  async createUser(createDataUser: CreateUserDto): Promise<UserEntity> {
-    return await this.usersRepository.save({ ...createDataUser, version: 1 });
+  async createUser(createDataUser: CreateUserDto): Promise<ReturnUserDto> {
+    const createdAt = Date.now();
+
+    const user = await this.usersRepository.save({
+      ...createDataUser,
+      createdAt,
+      updatedAt: createdAt,
+      version: 1,
+    });
+
+    const {
+      id,
+      login,
+      createdAt: dateNow,
+      updatedAt: update,
+      version: v,
+    } = user;
+
+    return {
+      id,
+      login,
+      version: v,
+      createdAt: dateNow,
+      updatedAt: update,
+    };
   }
 
   async updateUser(
     id: string,
     updateDataUser: UpdateUserDto,
   ): Promise<UserEntity> {
-    const user = await this.findOneUser(id);
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'login', 'version', 'createdAt', 'updatedAt', 'password'],
+    });
 
     const newUser = { ...user };
 
@@ -37,6 +64,8 @@ export class UsersService {
 
     newUser.password = updateDataUser.newPassword;
     newUser.version = user.version + 1;
+    newUser.updatedAt = Date.now();
+
     await this.usersRepository.update(id, newUser);
     return await this.findOneUser(id);
   }
