@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { AlbumDto } from './dto/album.dto';
+import { ReturnAlbumDto } from './dto/returnAlbum.dto';
 import { AlbumEntity } from './entity/album.entity';
 
 @Controller('album')
@@ -36,7 +37,7 @@ export class AlbumsController {
   updateAlbum(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() upDataAlbum: AlbumDto,
-  ): Promise<AlbumEntity> {
+  ): Promise<ReturnAlbumDto> {
     return this.albumsService.upDateAlbum(id, upDataAlbum);
   }
 

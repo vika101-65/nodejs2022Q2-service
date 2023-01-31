@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ArtistsService } from 'src/artists/artists.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { Repository } from 'typeorm';
+import { ReturnAlbumDto } from './dto/returnAlbum.dto';
 import { AlbumDto } from './dto/album.dto';
 import { AlbumEntity } from './entity/album.entity';
 
@@ -24,15 +25,19 @@ export class AlbumsService {
   ) {}
 
   async createAlbum(createDataAlbum: AlbumDto): Promise<AlbumEntity> {
-    const artist = await this.artistsService.findOneArtist(
-      createDataAlbum.artistId,
-    );
-
     const album = new AlbumEntity();
     album.name = createDataAlbum.name;
     album.year = createDataAlbum.year;
-    album.artist = artist;
-    await this.albumRepository.save(album);
+
+    if (createDataAlbum.artistId) {
+      const artist = await this.artistsService.findOneArtist(
+        createDataAlbum.artistId,
+      );
+
+      album.artist = artist;
+    } else {
+      album.artist = null;
+    }
 
     return await this.albumRepository.save(album);
   }
@@ -42,11 +47,17 @@ export class AlbumsService {
       relations: {
         artist: true,
       },
+      select: {
+        artist: {
+          id: true,
+        },
+      },
     });
   }
 
   async getOneAlbum(id: string): Promise<AlbumEntity> {
     const album = await this.albumRepository.findOneBy({ id });
+
     if (!album) {
       throw new HttpException('ALBUM NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -57,10 +68,18 @@ export class AlbumsService {
       relations: {
         artist: true,
       },
+      select: {
+        artist: {
+          id: true,
+        },
+      },
     });
   }
 
-  async upDateAlbum(id: string, upDataAlbumb: AlbumDto): Promise<AlbumEntity> {
+  async upDateAlbum(
+    id: string,
+    upDataAlbumb: AlbumDto,
+  ): Promise<ReturnAlbumDto> {
     const album = await this.albumRepository.findOneBy({ id });
 
     if (!album) {
@@ -82,7 +101,23 @@ export class AlbumsService {
     album.name = upDataAlbumb.name;
     album.year = upDataAlbumb.year;
 
-    return await this.albumRepository.save(album);
+    await this.albumRepository.save(album);
+
+    const newAlbum = await this.albumRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        artist: true,
+      },
+      select: {
+        artist: {
+          id: true,
+        },
+      },
+    });
+
+    return { ...newAlbum, artist: newAlbum.artist.id };
   }
 
   async removeAlbum(id: string): Promise<void> {
