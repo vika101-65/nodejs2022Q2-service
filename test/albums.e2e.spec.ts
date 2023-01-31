@@ -104,13 +104,13 @@ describe('Album (e2e)', () => {
         .set(commonHeaders)
         .send(createAlbumDto);
 
-      const { id, name, year, artistId } = response.body;
+      const { id, name, year, artist } = response.body;
 
       expect(response.status).toBe(StatusCodes.CREATED);
 
       expect(name).toBe(createAlbumDto.name);
       expect(year).toBe(createAlbumDto.year);
-      expect(artistId).toBe(createAlbumDto.artistId);
+      expect(artist).toBe(createAlbumDto.artistId);
       expect(validate(id)).toBe(true);
       const cleanupResponse = await unauthorizedRequest
         .delete(albumsRoutes.delete(id))
@@ -178,11 +178,11 @@ describe('Album (e2e)', () => {
 
       expect(updateResponse.statusCode).toBe(StatusCodes.OK);
 
-      const { id: updatedId, name, year, artistId } = updateResponse.body;
+      const { id: updatedId, name, year, artist } = updateResponse.body;
 
       expect(name).toBe(createAlbumDto.name);
       expect(year).toBe(updatedYear);
-      expect(artistId).toBe(updateArtistId);
+      expect(artist).toBe(updateArtistId);
       expect(validate(updatedId)).toBe(true);
       expect(createdId).toBe(updatedId);
 
@@ -318,8 +318,8 @@ describe('Album (e2e)', () => {
 
       expect(searchTrackResponse.statusCode).toBe(StatusCodes.OK);
 
-      const { albumId } = searchTrackResponse.body;
-      expect(albumId).toBe(null);
+      const { album } = searchTrackResponse.body;
+      expect(album).toBe(null);
     });
   });
 });

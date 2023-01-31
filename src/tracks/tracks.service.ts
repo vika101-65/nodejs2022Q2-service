@@ -33,6 +33,8 @@ export class TracksService {
       }
 
       track.album = album;
+    } else {
+      track.album = null;
     }
 
     if (createDataTrack.artistId) {
@@ -45,6 +47,8 @@ export class TracksService {
       }
 
       track.artist = artist;
+    } else {
+      track.artist = null;
     }
 
     track.name = createDataTrack.name;
@@ -95,6 +99,8 @@ export class TracksService {
       }
 
       track.album = album;
+    } else {
+      track.album = null;
     }
 
     if (upDateTrack.artistId) {
@@ -107,6 +113,8 @@ export class TracksService {
       }
 
       track.artist = artist;
+    } else {
+      track.artist = null;
     }
 
     track.name = upDateTrack.name;

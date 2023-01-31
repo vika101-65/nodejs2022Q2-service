@@ -102,12 +102,12 @@ describe('Tracks (e2e)', () => {
 
       expect(response.status).toBe(StatusCodes.CREATED);
 
-      const { id, name, duration, artistId, albumId } = response.body;
+      const { id, name, duration, artist, album } = response.body;
       expect(validate(id)).toBe(true);
       expect(name).toBe(createTrackDto.name);
       expect(duration).toBe(createTrackDto.duration);
-      expect(artistId).toBe(createTrackDto.artistId);
-      expect(albumId).toBe(createTrackDto.albumId);
+      expect(artist).toBe(createTrackDto.artistId);
+      expect(album).toBe(createTrackDto.albumId);
 
       const cleanupResponse = await unauthorizedRequest
         .delete(tracksRoutes.delete(id))
@@ -169,13 +169,13 @@ describe('Tracks (e2e)', () => {
         id: updatedId,
         name,
         duration,
-        artistId,
-        albumId,
+        artist,
+        album,
       } = updateResponse.body;
 
       expect(name).toBe(createTrackDto.name);
-      expect(artistId).toBe(createTrackDto.artistId);
-      expect(albumId).toBe(createTrackDto.albumId);
+      expect(artist).toBe(createTrackDto.artistId);
+      expect(album).toBe(createTrackDto.albumId);
       expect(typeof duration).toBe('number');
       expect(validate(updatedId)).toBe(true);
       expect(createdId).toBe(updatedId);
