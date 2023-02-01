@@ -25,20 +25,12 @@ export class FavoritesService {
     private readonly tracksService: TracksService,
   ) {}
 
-  async createFavorites() {
+  createFavorite() {
     const favorite = new FavoriteEntity();
-    await this.favoriteRepository.save(favorite);
-  }
-
-  async findFavorite() {
-    const favorite = await this.favoriteRepository.find();
-
-    if (favorite.length !== 0) {
-      return true;
-    }
-    if (favorite.length === 0) {
-      return false;
-    }
+    favorite.tracks = [];
+    favorite.albums = [];
+    favorite.artists = [];
+    return favorite;
   }
 
   async getFavorite(): Promise<FavoriteEntity> {
@@ -47,15 +39,15 @@ export class FavoritesService {
     return favorite;
   }
 
-  async addTrackToFavorites(id: string): Promise<FavoriteEntity> {
-    if (!this.findFavorite()) {
-      this.createFavorites();
+  async addTrackToFavorites(id: string) {
+    let favorite = await this.getFavorite();
+
+    if (!favorite) {
+      favorite = this.createFavorite();
     }
 
-    const favorite = await this.getFavorite();
-
     try {
-      const track = await this.tracksService.getOneTrack(id);
+      await this.tracksService.getOneTrack(id);
     } catch (error) {
       throw new HttpException(
         `TTRACK WITH ${id} ID NOT_FOUND`,
@@ -66,11 +58,11 @@ export class FavoritesService {
     if (favorite.tracks?.length > 0) {
       favorite.tracks.push(id);
     }
-    if (favorite.tracks.length === 0 || !favorite.tracks) {
+    if (!favorite.tracks || favorite.tracks.length === 0) {
       favorite.tracks = [id];
     }
 
-    return this.favoriteRepository.save(favorite);
+    return await this.favoriteRepository.save(favorite);
   }
 
   async deleteTrackFromFavorites(id: string): Promise<FavoriteEntity> {
@@ -89,14 +81,14 @@ export class FavoritesService {
   }
 
   async addAlbumToFavorites(id: string): Promise<FavoriteEntity> {
-    if (!this.findFavorite()) {
-      this.createFavorites();
+    let favorite = await this.getFavorite();
+
+    if (!favorite) {
+      favorite = favorite = this.createFavorite();
     }
 
-    const favorite = await this.getFavorite();
-
     try {
-      const album = await this.albumsService.getOneAlbum(id);
+      await this.albumsService.getOneAlbum(id);
     } catch (error) {
       throw new HttpException(
         `ALBUM WITH ${id} ID NOT_FOUND`,
@@ -107,7 +99,7 @@ export class FavoritesService {
     if (favorite.albums?.length > 0) {
       favorite.albums.push(id);
     }
-    if (favorite.albums.length === 0 || !favorite.albums) {
+    if (!favorite.albums || favorite.albums.length === 0) {
       favorite.albums = [id];
     }
 
@@ -130,14 +122,14 @@ export class FavoritesService {
   }
 
   async addArtistToFavorites(id: string): Promise<FavoriteEntity> {
-    if (!this.findFavorite()) {
-      this.createFavorites();
+    let favorite = await this.getFavorite();
+
+    if (!favorite) {
+      favorite = this.createFavorite();
     }
 
-    const favorite = await this.getFavorite();
-
     try {
-      const artist = await this.artistsService.findOneArtist(id);
+      await this.artistsService.findOneArtist(id);
     } catch (error) {
       throw new HttpException(
         `ARTIST WITH ${id} ID NOT_FOUND`,
@@ -148,11 +140,11 @@ export class FavoritesService {
     if (favorite.artists?.length > 0) {
       favorite.artists.push(id);
     }
-    if (favorite.artists.length === 0 || !favorite.artists) {
+    if (!favorite.artists || favorite.artists.length === 0) {
       favorite.artists = [id];
     }
 
-    return this.favoriteRepository.save(favorite);
+    return await this.favoriteRepository.save(favorite);
   }
 
   async deleteArtistFromFavorites(id: string): Promise<FavoriteEntity> {
@@ -186,6 +178,14 @@ export class FavoritesService {
 
   async getFavorites() {
     const favorite = await this.getFavorite();
+
+    if (!favorite) {
+      return {
+        artists: [],
+        albums: [],
+        tracks: [],
+      };
+    }
     const artistsId = favorite.artists || [];
     const albumsId = favorite.albums || [];
     const tracksId = favorite.tracks || [];
@@ -206,7 +206,22 @@ export class FavoritesService {
     const albums = await Promise.all(albumsPromise);
     const tracks = await Promise.all(tracksPromise);
 
-    const favorites = { id: favorite.id, artists, albums, tracks };
+    const newAlbums = albums.map((item) => ({
+      ...item,
+      artist: item.artist ? item.artist.id : null,
+    }));
+    const newTracks = tracks.map((item) => ({
+      ...item,
+      artist: item.artist ? item.artist.id : null,
+      album: item.album ? item.album.id : null,
+    }));
+
+    const favorites = {
+      id: favorite.id,
+      artists,
+      albums: newAlbums,
+      tracks: newTracks,
+    };
 
     return favorites;
   }

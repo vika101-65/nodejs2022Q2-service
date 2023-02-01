@@ -141,15 +141,15 @@ describe('Favorites (e2e)', () => {
         id: albumId,
         name: createAlbumDto.name,
         year: createAlbumDto.year,
-        artistId,
+        artist: artistId,
       });
 
       expect(response.body.tracks).toContainEqual({
         id: trackId,
         name: createTrackDto.name,
         duration: createTrackDto.duration,
-        artistId,
-        albumId,
+        artist: artistId,
+        album: albumId,
       });
 
       const deleteArtistResponse = await unauthorizedRequest
@@ -248,7 +248,7 @@ describe('Favorites (e2e)', () => {
         id: albumId,
         name: createAlbumDto.name,
         year: createAlbumDto.year,
-        artistId: createAlbumDto.artistId,
+        artist: createAlbumDto.artistId,
       });
     });
 
@@ -279,8 +279,8 @@ describe('Favorites (e2e)', () => {
         id: trackId,
         name: createTrackDto.name,
         duration: createTrackDto.duration,
-        artistId: createTrackDto.artistId,
-        albumId: createTrackDto.albumId,
+        artist: createTrackDto.artistId,
+        album: createTrackDto.albumId,
       });
     });
 

@@ -1,13 +1,4 @@
-import { AlbumEntity } from 'src/albums/entity/album.entity';
-import { ArtistEntity } from 'src/artists/entity/artist.entity';
-import { TrackEntity } from 'src/tracks/entity/track.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('favorites')
 export class FavoriteEntity {
@@ -15,14 +6,11 @@ export class FavoriteEntity {
   id: string;
 
   @Column('simple-array', { nullable: true })
-  // @Column({ array: true })
-  artists: string[]; // favorite artists ids\
+  artists: string[];
 
   @Column('simple-array', { nullable: true })
-  // @Column({ array: true })
-  albums: string[]; // favorite albums ids
+  albums: string[];
 
   @Column('simple-array', { nullable: true })
-  // @Column({ array: true })
-  tracks: string[]; // favorite tracks ids}
+  tracks: string[];
 }

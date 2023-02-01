@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -8,7 +7,6 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
-import { FavoriteDto } from './dto/favorite.dto';
 import { FavoriteEntity } from './etity/favorite.entity';
 import { FavoritesService } from './favorites.service';
 
@@ -17,9 +15,7 @@ export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 
   @Post('/track/:id')
-  addTrackToFavorites(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<FavoriteEntity> {
+  addTrackToFavorites(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.addTrackToFavorites(id);
   }
 
@@ -56,7 +52,7 @@ export class FavoritesController {
   }
 
   @Get()
-  getFavoritesEntity() {console.log('++++++++')
+  getFavoritesEntity() {
     return this.favoritesService.getFavorites();
   }
 }
